@@ -10,3 +10,4 @@ versioneer.pyc
 .vscode
 data
 .idea
+poetry.lock
