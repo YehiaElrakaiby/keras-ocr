@@ -11,3 +11,5 @@ versioneer.pyc
 data
 .idea
 poetry.lock
+custom_keras_ocr/playground_steps/fonts
+custom_keras_ocr/playground_steps/backgrounds
