@@ -59,6 +59,7 @@ from custom_keras_ocr import fonts, backgrounds
 text_generator = keras_ocr.data_generation.my_get_text_generator(alphabet=alphabet)
 print('The first generated text is:', next(text_generator))
 
+
 ###
 #
 # Generate Synthetic Data
