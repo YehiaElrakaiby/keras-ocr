@@ -123,8 +123,8 @@ def font_supports_alphabet(filepath, alphabet):
         return True
     font = fontTools.ttLib.TTFont(filepath)
     if not all(
-        any(ord(c) in table.cmap.keys() for table in font["cmap"].tables)
-        for c in alphabet
+            any(ord(c) in table.cmap.keys() for table in font["cmap"].tables)
+            for c in alphabet
     ):
         return False
     font = PIL.ImageFont.truetype(filepath)
@@ -146,6 +146,27 @@ def get_text_generator(alphabet=None, lowercase=False, max_string_length=None):
         max_string_length: The maximum length of the string
     """
     gen = essential_generators.DocumentGenerator()
+    while True:
+        sentence = gen.sentence()
+        if lowercase:
+            sentence = sentence.lower()
+        sentence = "".join([s for s in sentence if (alphabet is None or s in alphabet)])
+        if max_string_length is not None:
+            sentence = sentence[:max_string_length]
+        yield sentence
+
+
+def my_get_text_generator(alphabet=None, lowercase=False, max_string_length=None):
+    """Generates strings of sentences using only the letters in alphabet.
+
+    Args:
+        alphabet: The alphabet of permitted characters
+        lowercase: Whether to convert all strings to lowercase.
+        max_string_length: The maximum length of the string
+    """
+    gen = essential_generators.DocumentGenerator()
+    from extract_characters import words_list, sentences_3_words, sentences_2_words
+    gen.sentence_cache = words_list + sentences_2_words + sentences_3_words
     while True:
         sentence = gen.sentence()
         if lowercase:
@@ -210,9 +231,9 @@ def get_backgrounds(cache_dir=None):
 
 
 def get_fonts(
-    cache_dir=None,
-    alphabet=string.ascii_letters + string.digits,
-    exclude_smallcaps=False,
+        cache_dir=None,
+        alphabet=string.ascii_letters + string.digits,
+        exclude_smallcaps=False,
 ):
     """Download a set of pre-reviewed fonts.
 
@@ -245,17 +266,17 @@ def get_fonts(
     font_filepaths = glob.glob(os.path.join(fonts_dir, "**/*.ttf"))
     if exclude_smallcaps:
         with open(
-            tools.download_and_verify(
-                url="https://github.com/faustomorales/keras-ocr/releases/download/v0.8.4/fonts_smallcaps.txt",
-                sha256="6531c700523c687f02852087530d1ab3c7cc0b59891bbecc77726fbb0aabe68e",
-                filename="fonts_smallcaps.txt",
-                cache_dir=cache_dir,
-            ),
-            "r",
-            encoding="utf8",
+                tools.download_and_verify(
+                    url="https://github.com/faustomorales/keras-ocr/releases/download/v0.8.4/fonts_smallcaps.txt",
+                    sha256="6531c700523c687f02852087530d1ab3c7cc0b59891bbecc77726fbb0aabe68e",
+                    filename="fonts_smallcaps.txt",
+                    cache_dir=cache_dir,
+                ),
+                "r",
+                encoding="utf8",
         ) as f:
             smallcaps_fonts = f.read().split("\n")
-            smallcaps_fonts = [ origpath.replace('/', os.path.sep) for origpath in smallcaps_fonts ]
+            smallcaps_fonts = [origpath.replace('/', os.path.sep) for origpath in smallcaps_fonts]
             font_filepaths = [
                 filepath
                 for filepath in font_filepaths
@@ -277,7 +298,7 @@ def convert_lines_to_paragraph(lines):
 
 
 def convert_image_generator_to_recognizer_input(
-    image_generator, max_string_length, target_width, target_height, margin=0
+        image_generator, max_string_length, target_width, target_height, margin=0
 ):
     """Convert an image generator created by get_image_generator
     to (image, sentence) tuples for training a recognizer.
@@ -315,18 +336,18 @@ def convert_image_generator_to_recognizer_input(
 
 
 def draw_text_image(
-    text,
-    fontsize,
-    height,
-    width,
-    fonts,
-    use_ligatures=False,
-    thetaX=0,
-    thetaY=0,
-    thetaZ=0,
-    color=(0, 0, 0),
-    permitted_contour=None,
-    draw_contour=False,
+        text,
+        fontsize,
+        height,
+        width,
+        fonts,
+        use_ligatures=False,
+        thetaX=0,
+        thetaY=0,
+        thetaZ=0,
+        color=(0, 0, 0),
+        permitted_contour=None,
+        draw_contour=False,
 ):
     """Get a transparent image containing text.
 
@@ -436,9 +457,9 @@ def draw_text_image(
             dx = character_width
         x2, y2 = (x + character_width + offset_x, y + character_height + offset_y)
         while not all(
-            cv2.pointPolygonTest(contour=transformed_contour, pt=pt, measureDist=False)
-            >= 0
-            for pt in [(int(x), int(y)), (int(x2), int(y)), (int(x2), int(y2)), (int(x), int(y2))]
+                cv2.pointPolygonTest(contour=transformed_contour, pt=pt, measureDist=False)
+                >= 0
+                for pt in [(int(x), int(y)), (int(x2), int(y)), (int(x2), int(y2)), (int(x), int(y2))]
         ):
             if x2 > end_x:
                 dy = max(1, max_y - y)
@@ -537,18 +558,18 @@ def compute_transformed_contour(width, height, fontsize, M, contour, minarea=0.5
                 for x, y in slots
             ]
         )
-        .reshape(-1, 4)
-        .all(axis=1)
+            .reshape(-1, 4)
+            .all(axis=1)
     )
     slots = slots.reshape(-1, 4, 2)
     areas = (
-        np.abs(
-            (slots[:, 0, 0] * slots[:, 1, 1] - slots[:, 0, 1] * slots[:, 1, 0])
-            + (slots[:, 1, 0] * slots[:, 2, 1] - slots[:, 1, 1] * slots[:, 2, 0])
-            + (slots[:, 2, 0] * slots[:, 3, 1] - slots[:, 2, 1] * slots[:, 3, 0])
-            + (slots[:, 3, 0] * slots[:, 0, 1] - slots[:, 3, 1] * slots[:, 0, 0])
-        )
-        / 2
+            np.abs(
+                (slots[:, 0, 0] * slots[:, 1, 1] - slots[:, 0, 1] * slots[:, 1, 0])
+                + (slots[:, 1, 0] * slots[:, 2, 1] - slots[:, 1, 1] * slots[:, 2, 0])
+                + (slots[:, 2, 0] * slots[:, 3, 1] - slots[:, 2, 1] * slots[:, 3, 0])
+                + (slots[:, 3, 0] * slots[:, 0, 1] - slots[:, 3, 1] * slots[:, 0, 0])
+            )
+            / 2
     )
     slots_filtered = slots_pretransform[(areas > minarea * spacing * spacing) & inside]
     temporary_image = cv2.drawContours(
@@ -565,31 +586,31 @@ def compute_transformed_contour(width, height, fontsize, M, contour, minarea=0.5
     )
     x, y = slots_filtered[0][0]
     contour = newContours[
-        next(
-            index
-            for index, contour in enumerate(newContours)
-            if cv2.pointPolygonTest(contour=contour, pt=(int(x), int(y)), measureDist=False) >= 0
-        )
-    ][:, 0, :]
+                  next(
+                      index
+                      for index, contour in enumerate(newContours)
+                      if cv2.pointPolygonTest(contour=contour, pt=(int(x), int(y)), measureDist=False) >= 0
+                  )
+              ][:, 0, :]
     return contour
 
 
 def get_image_generator(
-    height,
-    width,
-    font_groups,
-    text_generator,
-    font_size: typing.Union[int, typing.Tuple[int, int]] = 18,
-    backgrounds: typing.List[typing.Union[str, np.ndarray]] = None,
-    background_crop_mode="crop",
-    rotationX: typing.Union[int, typing.Tuple[int, int]] = 0,
-    rotationY: typing.Union[int, typing.Tuple[int, int]] = 0,
-    rotationZ: typing.Union[int, typing.Tuple[int, int]] = 0,
-    margin=0,
-    use_ligatures=False,
-    augmenter=None,
-    draw_contour=False,
-    draw_contour_text=False,
+        height,
+        width,
+        font_groups,
+        text_generator,
+        font_size: typing.Union[int, typing.Tuple[int, int]] = 18,
+        backgrounds: typing.List[typing.Union[str, np.ndarray]] = None,
+        background_crop_mode="crop",
+        rotationX: typing.Union[int, typing.Tuple[int, int]] = 0,
+        rotationY: typing.Union[int, typing.Tuple[int, int]] = 0,
+        rotationZ: typing.Union[int, typing.Tuple[int, int]] = 0,
+        margin=0,
+        use_ligatures=False,
+        augmenter=None,
+        draw_contour=False,
+        draw_contour_text=False,
 ):
     """Create a generator for images containing text.
 
@@ -635,19 +656,19 @@ def get_image_generator(
         alphabet
     ), "Each character can appear in the subalphabet for only one font group."
     for text, background_index, current_font_groups in zip(
-        text_generator,
-        itertools.cycle(range(len(backgrounds))),
-        zip(
-            *[
-                itertools.cycle(
-                    [
-                        (subalphabet, font_filepath)
-                        for font_filepath in font_group_filepaths
-                    ]
-                )
-                for subalphabet, font_group_filepaths in font_groups.items()
-            ]
-        ),
+            text_generator,
+            itertools.cycle(range(len(backgrounds))),
+            zip(
+                *[
+                    itertools.cycle(
+                        [
+                            (subalphabet, font_filepath)
+                            for font_filepath in font_group_filepaths
+                        ]
+                    )
+                    for subalphabet, font_group_filepaths in font_groups.items()
+                ]
+            ),
     ):
         if background_index == 0:
             random.shuffle(backgrounds)
@@ -676,8 +697,8 @@ def get_image_generator(
         if augmenter is not None:
             current_background = augmenter(images=[current_background])[0]
         if (
-            current_background.shape[0] != height
-            or current_background.shape[1] != width
+                current_background.shape[0] != height
+                or current_background.shape[1] != width
         ):
             current_background = tools.fit(
                 current_background,
