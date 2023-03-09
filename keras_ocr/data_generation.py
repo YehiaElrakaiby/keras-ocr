@@ -165,7 +165,7 @@ def my_get_text_generator(alphabet=None, lowercase=False, max_string_length=None
         max_string_length: The maximum length of the string
     """
     gen = essential_generators.DocumentGenerator()
-    from extract_characters import words_list, sentences_3_words, sentences_2_words
+    from keras_ocr_customizer import words_list, sentences_3_words, sentences_2_words
     gen.sentence_cache = words_list + sentences_2_words + sentences_3_words
     while True:
         sentence = gen.sentence()

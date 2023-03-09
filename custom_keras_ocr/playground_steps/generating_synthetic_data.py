@@ -12,7 +12,7 @@ import tensorflow as tf
 import sklearn.model_selection
 
 import keras_ocr
-from extract_characters import alphabet  # Alphabet is generated from words written on gym machines
+from keras_ocr_customizer.ocr_customizer import KerasOCRCustomizer  # Alphabet is generated from words written on gym machines
 from custom_keras_ocr import fonts, backgrounds
 
 # assert tf.test.is_gpu_available(), 'No GPU is available.'
@@ -22,6 +22,7 @@ from custom_keras_ocr import fonts, backgrounds
 # Download fonts and background
 #
 ###
+kers_ocr_optimizer = KerasOCRCustomizer()
 
 data_dir = '.'
 
@@ -31,7 +32,7 @@ data_dir = '.'
 #
 ###
 # alphabet = string.digits + string.ascii_letters + '!?. '
-recognizer_alphabet = ''.join(sorted(set(alphabet.lower())))
+recognizer_alphabet = ''.join(sorted(set(kers_ocr_optimizer.alphabet.lower())))
 # print(f'recognizer_alphabet is {recognizer_alphabet}')
 
 ###
@@ -41,15 +42,15 @@ recognizer_alphabet = ''.join(sorted(set(alphabet.lower())))
 ###
 # Download fonts: fonts is a list of font filepaths.
 fonts = keras_ocr.data_generation.get_fonts(
-    alphabet=alphabet,
+    alphabet=kers_ocr_optimizer.alphabet,
     cache_dir=data_dir
 )
 # print(f'fonts is {fonts}')
 
 # Download backgrounds
-# backgrounds = keras_ocr.data_generation.get_backgrounds(
-#     cache_dir=data_dir
-# )
+backgrounds = keras_ocr.data_generation.get_backgrounds(
+    cache_dir=data_dir
+)
 # print(f'backgrounds is {backgrounds}')
 
 ###
@@ -58,7 +59,7 @@ fonts = keras_ocr.data_generation.get_fonts(
 #
 ###
 
-text_generator = keras_ocr.data_generation.my_get_text_generator(alphabet=alphabet)
+text_generator = kers_ocr_optimizer.custom_get_text_generator(alphabet=kers_ocr_optimizer.alphabet)
 print('The first generated text is:', next(text_generator))
 
 
@@ -95,7 +96,7 @@ image_generators = [
         width=640,
         text_generator=text_generator,
         font_groups={
-            alphabet: current_fonts
+            kers_ocr_optimizer.alphabet: current_fonts
         },
         backgrounds=current_backgrounds,
         font_size=(60, 120),
