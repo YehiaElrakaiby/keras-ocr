@@ -1,5 +1,6 @@
 import os
 import pathlib
+import shutil
 
 from customizer_keras_ocr import KerasOCRCustomizer
 
@@ -1965,7 +1966,6 @@ fonts_list = ['./resources/fonts/ubuntumono/UbuntuMono-BoldItalic.ttf',
               './resources/fonts/noticiatext/NoticiaText-Italic.ttf',
               './resources/fonts/noticiatext/NoticiaText-Bold.ttf']
 
-import shutil
 
 destination_folder_parts = fonts_list[0].split('/')
 print(destination_folder_parts)
