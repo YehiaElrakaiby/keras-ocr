@@ -58,6 +58,7 @@ HR
 Inclinaison
 incline
 Incline %
+Incline%
 Interval
 Intervalles
 Kcal
