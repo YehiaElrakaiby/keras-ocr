@@ -109,7 +109,8 @@ class KerasOCRCustomizer:
                 sentence = sentence[:max_string_length]
             yield sentence
 
-    def get_train_validation_test_split(self, arr):
+    @staticmethod
+    def get_train_validation_test_split(arr):
         train, valtest = sklearn.model_selection.train_test_split(arr, train_size=0.8, random_state=42)
         val, test = sklearn.model_selection.train_test_split(valtest, train_size=0.5, random_state=42)
         return train, val, test
